@@ -1,4 +1,4 @@
-name: CMake CI
+name: CMake Multi-Platform CI
 
 on:
   push:
@@ -8,12 +8,32 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Название работы будет меняться в зависимости от ОС и компилятора
+    name: ${{ matrix.os }} with ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false # Не останавливать другие сборки, если одна упала
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        compiler: [gcc, clang]
+        include:
+          # В Windows по умолчанию используем стандартный компилятор (MSVC)
+          # Поэтому уточняем параметры для Windows отдельно
+          - os: windows-latest
+            compiler: msvc
+        exclude:
+          # Исключаем комбинации, которые сложно настраивать без опыта
+          - os: windows-latest
+            compiler: gcc
+          - os: windows-latest
+            compiler: clang
 
     steps:
     - uses: actions/checkout@v3
 
     - name: Configure CMake
+      # Для Windows и Linux команда cmake одинакова
       run: cmake -H. -B_build -DCMAKE_INSTALL_PREFIX=_install
 
     - name: Build
@@ -21,3 +41,4 @@ jobs:
 
     - name: Install
       run: cmake --build _build --target install
+
