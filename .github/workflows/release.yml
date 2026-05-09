@@ -1,0 +1,21 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure and Build
+        run: |
+          cmake -H. -B_build -DCPACK_GENERATOR="TGZ;DEB;RPM"
+          cmake --build _build --target package
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: _build/*.deb, _build/*.rpm, _build/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
