@@ -8,37 +8,31 @@ on:
 
 jobs:
   build:
-    # Название работы будет меняться в зависимости от ОС и компилятора
     name: ${{ matrix.os }} with ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false # Не останавливать другие сборки, если одна упала
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
         compiler: [gcc, clang]
         include:
-          # В Windows по умолчанию используем стандартный компилятор (MSVC)
-          # Поэтому уточняем параметры для Windows отдельно
           - os: windows-latest
             compiler: msvc
         exclude:
-          # Исключаем комбинации, которые сложно настраивать без опыта
           - os: windows-latest
             compiler: gcc
           - os: windows-latest
             compiler: clang
 
-        steps:
-    - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Configure CMake
-      # Используем -S . вместо -H. для совместимости с Windows
-      run: cmake -S . -B _build -DCMAKE_INSTALL_PREFIX=_install
+      - name: Configure CMake
+        run: cmake -S . -B _build -DCMAKE_INSTALL_PREFIX=_install
 
-    - name: Build
-      run: cmake --build _build
+      - name: Build
+        run: cmake --build _build
 
-    - name: Install
-      run: cmake --build _build --target install
-
+      - name: Install
+        run: cmake --build _build --target install
