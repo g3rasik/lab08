@@ -29,12 +29,12 @@ jobs:
           - os: windows-latest
             compiler: clang
 
-    steps:
+        steps:
     - uses: actions/checkout@v3
 
     - name: Configure CMake
-      # Для Windows и Linux команда cmake одинакова
-      run: cmake -H. -B_build -DCMAKE_INSTALL_PREFIX=_install
+      # Используем -S . вместо -H. для совместимости с Windows
+      run: cmake -S . -B _build -DCMAKE_INSTALL_PREFIX=_install
 
     - name: Build
       run: cmake --build _build
