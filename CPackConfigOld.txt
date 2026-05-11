@@ -18,9 +18,3 @@ set(CPACK_RPM_PACKAGE_RELEASE 1)
 set(CPACK_DEBIAN_PACKAGE_NAME "libprint-dev")
 set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
 include(CPack)
-
-# Настройки для Windows (WIX)
-set(CPACK_WIX_UPGRADE_GUID "ECAA3A17-575B-460B-97D0-21398869A683")
-
-# Настройки для macOS (DragNDrop)
-set(CPACK_DMG_VOLUME_NAME "SolverInstall")
