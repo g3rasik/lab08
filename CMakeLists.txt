@@ -1,57 +1,55 @@
 cmake_minimum_required(VERSION 3.4)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#глобально запрещаем компилятору трактовать предупреждения как ошибки
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=maybe-uninitialized -Wno-maybe-uninitialized")
 
-option(BUILD_EXAMPLES "Build examples" OFF)
-option(BUILD_TESTS "Build tests" OFF)
+#подключаем HunterGate
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com"
+    SHA1 "11578e9b6a18d3632cf4308a0d24c0840b3c625a"
+)
 
 project(print)
+
 set(PRINT_VERSION_MAJOR 0)
 set(PRINT_VERSION_MINOR 1)
 set(PRINT_VERSION_PATCH 0)
-set(PRINT_VERSION_TWEAK 0)
-set(PRINT_VERSION "${PRINT_VERSION_MAJOR}.${PRINT_VERSION_MINOR}.${PRINT_VERSION_PATCH}.${PRINT_VERSION_TWEAK}")
+set(PRINT_VERSION "${PRINT_VERSION_MAJOR}.${PRINT_VERSION_MINOR}.${PRINT_VERSION_PATCH}")
 set(PRINT_VERSION_STRING "v${PRINT_VERSION}")
 
-add_library(print STATIC ${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
+#подключение зависимостей через Hunter
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
+
+add_library(print STATIC sources/print.cpp)
 
 target_include_directories(print PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-if(BUILD_EXAMPLES)
-  file(GLOB EXAMPLE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp")
-  foreach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
-    get_filename_component(EXAMPLE_NAME ${EXAMPLE_SOURCE} NAME_WE)
-    add_executable(${EXAMPLE_NAME} ${EXAMPLE_SOURCE})
-    target_link_libraries(${EXAMPLE_NAME} print)
-    install(TARGETS ${EXAMPLE_NAME}
-      RUNTIME DESTINATION bin
-    )
-  endforeach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
+#сборка тестов (BUILD_TESTS=ON)
+option(BUILD_TESTS "Build tests" OFF)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_executable(test1 tests/test1.cpp)
+    #пофиксили: используем корректное имя таргета для GTest 1.12+
+    target_link_libraries(test1 print GTest::gtest_main)
+    add_test(NAME test1 COMMAND test1)
 endif()
 
-install(TARGETS print
+#сборка демонстрационного приложения (шаг №8)
+add_executable(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo/main.cpp)
+target_link_libraries(demo print)
+
+#правила инсталляции
+install(TARGETS print demo
     EXPORT print-config
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
 )
-
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
+install(DIRECTORY include/ DESTINATION include)
 install(EXPORT print-config DESTINATION cmake)
-
-if(BUILD_TESTS)
-  enable_testing()
-
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=maybe-uninitialized")
-
-  add_subdirectory(third-party/gtest)
-  file(GLOB PROJECT_TEST_SOURCES tests/*.cpp)
-  add_executable(check ${PROJECT_TEST_SOURCES})
-  target_link_libraries(check ${PROJECT_NAME} gtest_main)
-  add_test(NAME check COMMAND check)
-endif()
-include(CPackConfig.cmake)
