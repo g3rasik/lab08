@@ -1,2 +1,2 @@
-* Sat May 09 2026 g3rasik <dmitrovnikita2208@gmail.com> 0.1.0.0
-- Initial release
+* Sun May 17 2026 vxntvs <pavelakhmetov147@gmail.com> 0.1.0.0
+- Initial RPM release

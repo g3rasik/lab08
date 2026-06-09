@@ -1,2 +1,2 @@
-﻿[![CMake CI](https://github.com/g3rasik/lab05/actions/workflows/CI.yml/badge.svg)](https://github.com/g3rasik/lab05/actions)
-
+![CMake Build](https://github.com/vxntvs/lab06/actions/workflows/cmake.yml/badge.svg)
+Git lab 02

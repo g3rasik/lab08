@@ -1,0 +1,6 @@
+EOF
+EOF
+[B[A[B[B
+text1
+text2
+text3
