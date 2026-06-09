@@ -1,0 +1,23 @@
+name: CMake Build with Hunter
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  hunter-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    # Передаем флаг -Wno-maybe-uninitialized через окружение, чтобы Hunter-версия GTest не падала при сборке
+    - name: Configure and Build with Hunter
+      run: |
+        export CXXFLAGS="-Wno-error=maybe-uninitialized -Wno-maybe-uninitialized"
+        export CFLAGS="-Wno-error=maybe-uninitialized -Wno-maybe-uninitialized"
+        cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release
+        cmake --build _build

@@ -1,0 +1,27 @@
+name: Docker Build Check
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create local cmake stubs
+      run: |
+        mkdir -p cmake
+        echo "macro(HunterGate)" > cmake/HunterGate.cmake
+        echo "endmacro()" >> cmake/HunterGate.cmake
+        echo "macro(hunter_add_package)" >> cmake/HunterGate.cmake
+        echo "endmacro()" >> cmake/HunterGate.cmake
+        echo "macro(hunter_client)" >> cmake/HunterGate.cmake
+        echo "endmacro()" >> cmake/HunterGate.cmake
+        > cmake/GTestConfig.cmake
+
+    - name: Build Docker Image
+      run: docker build -t logger .
