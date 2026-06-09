@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.4)
 
 #глобально запрещаем компилятору трактовать предупреждения как ошибки
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=maybe-uninitialized -Wno-maybe-uninitialized")
+if(NOT MSVC)
+    add_compile_options(-Wno-error=maybe-uninitialized)
+    # или target_compile_options, в зависимости от того, как у вас написано
+endif()
 
 #подключаем HunterGate
 include("cmake/HunterGate.cmake")
