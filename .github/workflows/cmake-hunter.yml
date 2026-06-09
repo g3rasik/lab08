@@ -14,7 +14,6 @@ jobs:
       with:
         submodules: recursive
 
-    # Передаем флаг -Wno-maybe-uninitialized через окружение, чтобы Hunter-версия GTest не падала при сборке
     - name: Configure and Build with Hunter
       run: |
         export CXXFLAGS="-Wno-error=maybe-uninitialized -Wno-maybe-uninitialized"
